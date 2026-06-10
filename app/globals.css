@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+@theme {
+  --color-linkedin-blue: #0a66c2;
+  --color-linkedin-blue-dark: #004182;
+  --color-linkedin-bg: #f3f2ef;
+  --color-linkedin-text: #191919;
+  --color-linkedin-muted: #666666;
+  --color-linkedin-border: #e0e0e0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #f3f2ef;
+}
