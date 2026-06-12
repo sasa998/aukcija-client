@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Geist } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers/Providers";
+import { cn } from "@/lib/utils";
+import { HeroBanner } from "@/components/layout/HeroBanner";
+import { Navbar } from "@/components/layout/Navbar";
+import Link from "next/link";
+
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const inter = Inter({
   variable: "--font-inter",
@@ -20,9 +26,39 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-[var(--font-inter)]">
-        <Providers>{children}</Providers>
+    <html
+      lang="en"
+      className={cn(
+        "h-full",
+        "antialiased",
+        inter.variable,
+        "font-sans",
+        geist.variable,
+      )}
+    >
+      <body className="min-h-full flex flex-col justify-between font-[var(--font-inter)]">
+        <Providers>
+          <header>
+            <Navbar />
+            <HeroBanner />
+          </header>
+          <main className="max-w-[1300px] mx-auto h-auto">{children}</main>
+          <footer className="py-6 text-center text-xs text-[#666] space-x-3">
+            <span>© 2026 aukcija</span>
+            <Link
+              href="/privatnost"
+              className="hover:underline hover:text-[#0a66c2]"
+            >
+              Privatnost
+            </Link>
+            <Link
+              href="/uslovi"
+              className="hover:underline hover:text-[#0a66c2]"
+            >
+              Uslovi korišćenja
+            </Link>
+          </footer>
+        </Providers>
       </body>
     </html>
   );

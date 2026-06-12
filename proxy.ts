@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const PUBLIC_ROUTES = ["/login", "/register", "/verify-email"];
-
 const ACCESS_TOKEN_COOKIE = "access_token";
 
 export function proxy(request: NextRequest) {
@@ -12,7 +11,7 @@ export function proxy(request: NextRequest) {
   const isPublic = PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
 
   if (isPublic && hasToken) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/auctions", request.url));
   }
 
   return NextResponse.next();

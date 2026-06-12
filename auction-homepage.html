@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BidMarket — Auctions</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── Design Tokens ── */
+:root {
+  --blue:        #0a66c2;
+  --blue-dark:   #004182;
+  --blue-light:  #e8f0fb;
+  --blue-hover:  #0958a8;
+  --bg:          #f3f2ef;
+  --text:        #191919;
+  --muted:       #666666;
+  --border:      #e0e0e0;
+  --white:       #ffffff;
+  --green:       #057642;
+  --green-bg:    #e6f4ea;
+  --red:         #cc1016;
+  --red-bg:      #fdecea;
+  --orange:      #b24020;
+  --orange-bg:   #fdf0eb;
+  --surface:     #f9f8f6;
+  --radius:      8px;
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md:   0 2px 8px rgba(0,0,0,0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ══════════════════════════
+   NAVBAR
+══════════════════════════ */
+.navbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.nav-logo-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--blue);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+}
+.nav-logo-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: -0.02em;
+}
+
+.nav-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  height: 56px;
+  flex: 1;
+}
+.nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+}
+.nav-tab:hover { color: var(--text); }
+.nav-tab.active {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+  font-weight: 600;
+}
+.nav-tab .tab-icon { font-size: 16px; }
+.nav-tab .tab-lock {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.btn {
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--blue);
+  border: 1.5px solid var(--blue);
+}
+.btn-ghost:hover { background: var(--blue-light); }
+.btn-primary {
+  background: var(--blue);
+  color: white;
+}
+.btn-primary:hover { background: var(--blue-hover); }
+
+/* ══════════════════════════
+   HERO STRIP
+══════════════════════════ */
+.hero-strip {
+  background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue) 100%);
+  color: white;
+  padding: 28px 0;
+}
+.hero-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.hero-text h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.hero-text p {
+  font-size: 13px;
+  opacity: 0.8;
+  font-weight: 300;
+}
+.hero-stats {
+  display: flex;
+  gap: 32px;
+}
+.stat {
+  text-align: center;
+}
+.stat-num {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.stat-label {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ══════════════════════════
+   MAIN CONTENT
+══════════════════════════ */
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* ── Section ── */
+.section { display: none; }
+.section.active { display: block; }
+
+/* ── Section header ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 16px;
+}
+.section-title-wrap {}
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.section-count {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.filter-btn {
+  padding: 5px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--muted);
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.filter-btn:hover { border-color: var(--blue); color: var(--blue); }
+.filter-btn.active {
+  background: var(--blue);
+  color: white;
+  border-color: var(--blue);
+}
+
+.search-box {
+  position: relative;
+}
+.search-box input {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 12px 6px 32px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--white);
+  width: 200px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.search-box input:focus { border-color: var(--blue); }
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+/* ── Table Card ── */
+.table-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead th {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  padding: 12px 16px;
+  text-align: left;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+  cursor: pointer;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #fafaf9; }
+tbody td {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+/* item cell */
+.item-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.item-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  border: 1px solid var(--border);
+}
+.item-name {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.item-meta {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* price */
+.price-current {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 14px;
+}
+.price-start {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* bids badge */
+.bids-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--blue);
+}
+
+/* countdown */
+.countdown {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.countdown.ending-soon {
+  color: var(--red);
+}
+.countdown.ending-soon .dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--red);
+  border-radius: 50%;
+  margin-right: 5px;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+.countdown.normal { color: var(--muted); }
+.countdown.hours { color: var(--orange); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* status badge */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.status.live    { background: var(--green-bg); color: var(--green); }
+.status.ending  { background: var(--red-bg);   color: var(--red); }
+.status.hot     { background: var(--orange-bg); color: var(--orange); }
+.status-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* action btn */
+.bid-btn {
+  padding: 6px 14px;
+  border-radius: 16px;
+  background: var(--blue);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.bid-btn:hover { background: var(--blue-hover); }
+
+/* ── Pagination ── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.page-info { font-size: 12px; color: var(--muted); }
+.page-btns { display: flex; gap: 4px; }
+.page-btn {
+  width: 28px; height: 28px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.12s;
+}
+.page-btn:hover { border-color: var(--blue); color: var(--blue); }
+.page-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
+
+/* ══════════════════════════
+   AUTH GATE (My Listings)
+══════════════════════════ */
+.auth-gate {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 64px 40px;
+  text-align: center;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.gate-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--blue-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 20px;
+}
+.gate-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+.gate-body {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+.gate-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.btn-lg {
+  padding: 10px 24px;
+  font-size: 14px;
+  border-radius: 24px;
+}
+
+/* Auth state: logged-in My Listings */
+.my-listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.listing-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s, transform 0.15s;
+  cursor: pointer;
+}
+.listing-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+.listing-card-img {
+  height: 140px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  border-bottom: 1px solid var(--border);
+}
+.listing-card-body { padding: 16px; }
+.listing-card-name {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.listing-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.listing-card-label { font-size: 11px; color: var(--muted); }
+.listing-card-val { font-size: 13px; font-weight: 600; color: var(--text); }
+.listing-card-footer {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface);
+}
+.manage-btn {
+  font-size: 12px;
+  color: var(--blue);
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+}
+
+/* ── Toggle for demo ── */
+.demo-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.demo-toggle strong { color: var(--text); }
+.toggle-switch {
+  width: 36px; height: 20px;
+  background: var(--border);
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  border: none;
+}
+.toggle-switch.on { background: var(--blue); }
+.toggle-switch::after {
+  content: '';
+  width: 14px; height: 14px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 3px; left: 3px;
+  transition: left 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-switch.on::after { left: 19px; }
+
+/* ── Add Listing button ── */
+.add-listing-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 20px;
+  background: var(--blue);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+.add-listing-btn:hover { background: var(--blue-hover); }
+
+</style>
+</head>
+<body>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-icon">🔨</div>
+      <span class="nav-logo-text">BidMarket</span>
+    </a>
+
+    <div class="nav-tabs">
+      <div class="nav-tab active" id="tab-auctions" onclick="switchTab('auctions')">
+        <span class="tab-icon">🏷️</span>
+        Auctions
+      </div>
+      <div class="nav-tab" id="tab-mylistings" onclick="switchTab('mylistings')">
+        <span class="tab-icon">📦</span>
+        My Listings
+        <span class="tab-lock" id="lock-icon">🔒</span>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <!-- Demo toggle -->
+      <div style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted);">
+        <span>Guest</span>
+        <button class="toggle-switch" id="authToggle" onclick="toggleAuth()" title="Toggle auth state"></button>
+        <span>Logged in</span>
+      </div>
+      <div id="nav-auth-btns">
+        <button class="btn btn-ghost" style="margin-right:4px">Sign in</button>
+        <button class="btn btn-primary">Join now</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ HERO STRIP ══ -->
+<div class="hero-strip">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <h1>Live Auctions</h1>
+      <p>Bid on unique items from verified sellers. New auctions added every day.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">248</div>
+        <div class="stat-label">Live now</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">1,840</div>
+        <div class="stat-label">Bids today</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">94%</div>
+        <div class="stat-label">Completed</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN CONTENT ══ -->
+<main class="main">
+
+  <!-- ── AUCTIONS SECTION ── -->
+  <section class="section active" id="section-auctions">
+
+    <div class="section-header">
+      <div class="section-title-wrap">
+        <div class="section-title">All Auctions</div>
+        <div class="section-count">248 active listings</div>
+      </div>
+      <div class="filters">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search items…" />
+        </div>
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Ending soon</button>
+        <button class="filter-btn">Electronics</button>
+        <button class="filter-btn">Collectibles</button>
+        <button class="filter-btn">Art</button>
+        <button class="filter-btn" style="border-style:dashed">+ More</button>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:35%">Item</th>
+            <th>Current bid</th>
+            <th>Bids</th>
+            <th>Seller</th>
+            <th>Ends in</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="item-cell">
+                <div class="item-thumb">💻</div>
+                <div>
+                  <div class="item-name">Apple MacBook Pro 14" M3</div>
+                  <div class="item-meta">Electronics · Like new</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="price-current">€1,240.00</div>
+              <div class="price-start">Start: €800</div>
+            </td>
+            <td><span class="bids-badge">⚡ 34</span></td>
+            <td>
+              <div style="font-weight:500">tech_shop_eu</div>
+              <div style="font-size:11px; color:var(--muted)">⭐ 4.9 · 312 sales</div>
+            </td>
+            <td>
+              <div class="countdown ending-soon">
+                <span class="dot"></span>42m 18s
+              </div>
+            </td>
+            <td><span class="status ending"><span class="status-dot"></span>Hot</span></td>
+            <td><button class="bid-btn">Place bid</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="item-cell">
+                <div class="item-thumb">🎸</div>
+                <div>
+                  <div class="item-name">Fender Stratocaster 1972</div>
+                  <div class="item-meta">Instruments · Vintage</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="price-current">€3,800.00</div>
+              <div class="price-start">Start: €2,500</div>
+            </td>
+            <td><span class="bids-badge">⚡ 18</span></td>
+            <td>
+              <div style="font-weight:500">vintage_strings</div>
+              <div style="font-size:11px; color:var(--muted)">⭐ 5.0 · 89 sales</div>
+            </td>
+            <td>
+              <div class="countdown hours">2h 11m</div>
+            </td>
+            <td><span class="status hot"><span class="status-dot"></span>Active</span></td>
+            <td><button class="bid-btn">Place bid</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="item-cell">
+                <div class="item-thumb">🕰️</div>
+                <div>
+                  <div class="item-name">Omega Seamaster 300M</div>
+                  <div class="item-meta">Watches · Excellent</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="price-current">€2,100.00</div>
+              <div class="price-start">Start: €1,800</div>
+            </td>
+            <td><span class="bids-badge">⚡ 9</span></td>
+            <td>
+              <div style="font-weight:500">luxury_resell</div>
+              <div style="font-size:11px; color:var(--muted)">⭐ 4.7 · 54 sales</div>
+            </td>
+            <td>
+              <div class="countdown normal">1d 4h 30m</div>
+            </td>
+            <td><span class="status live"><span class="status-dot"></span>Live</span></td>
+            <td><button class="bid-btn">Place bid</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="item-cell">
+                <div class="item-thumb">🎨</div>
+                <div>
+                  <div class="item-name">Original Oil Painting — "Sunset Coast"</div>
+                  <div class="item-meta">Art · Original · 60×80cm</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="price-current">€480.00</div>
+              <div class="price-start">Start: €200</div>
+            </td>
+            <td><span class="bids-badge">⚡ 6</span></td>
+            <td>
+              <div style="font-weight:500">arthaus_studio</div>
+              <div style="font-size:11px; color:var(--muted)">⭐ 4.8 · 23 sales</div>
+            </td>
+            <td>
+              <div class="countdown normal">3d 18h</div>
+            </td>
+            <td><span class="status live"><span class="status-dot"></span>Live</span></td>
+            <td><button class="bid-btn">Place bid</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="item-cell">
+                <div class="item-thumb">📷</div>
+                <div>
+                  <div class="item-name">Sony A7 IV Mirrorless Camera</div>
+                  <div class="item-meta">Electronics · Body only</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="price-current">€1,950.00</div>
+              <div class="price-start">Start: €1,600</div>
+            </td>
+            <td><span class="bids-badge">⚡ 14</span></td>
+            <td>
+              <div style="font-weight:500">foto_market_ba</div>
+              <div style="font-size:11px; color:var(--muted)">⭐ 4.6 · 41 sales</div>
+            </td>
+            <td>
+              <div class="countdown hours">5h 44m</div>
+            </td>
+            <td><span class="status hot"><span class="status-dot"></span>Active</span></td>
+            <td><button class="bid-btn">Place bid</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="item-cell">
+                <div class="item-thumb">🧩</div>
+                <div>
+                  <div class="item-name">Lego Technic Bugatti Chiron — Sealed</div>
+                  <div class="item-meta">Collectibles · Sealed box</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="price-current">€320.00</div>
+              <div class="price-start">Start: €250</div>
+            </td>
+            <td><span class="bids-badge">⚡ 4</span></td>
+            <td>
+              <div style="font-weight:500">collector_hub</div>
+              <div style="font-size:11px; color:var(--muted)">⭐ 4.9 · 107 sales</div>
+            </td>
+            <td>
+              <div class="countdown normal">2d 6h</div>
+            </td>
+            <td><span class="status live"><span class="status-dot"></span>Live</span></td>
+            <td><button class="bid-btn">Place bid</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pagination">
+        <div class="page-info">Showing 1–6 of 248 auctions</div>
+        <div class="page-btns">
+          <button class="page-btn">‹</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <span style="font-size:12px; color:var(--muted); padding:0 4px; display:flex; align-items:center;">…</span>
+          <button class="page-btn">42</button>
+          <button class="page-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MY LISTINGS SECTION ── -->
+  <section class="section" id="section-mylistings">
+
+    <!-- UNAUTHENTICATED STATE -->
+    <div id="gate-view">
+      <div class="auth-gate">
+        <div class="gate-icon">🔐</div>
+        <div class="gate-title">Sign in to see your listings</div>
+        <div class="gate-body">
+          Track and manage the items you've put up for auction. Sign in or create an account to get started as a seller.
+        </div>
+        <div class="gate-actions">
+          <button class="btn btn-ghost btn-lg">Sign in</button>
+          <button class="btn btn-primary btn-lg">Create account</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUTHENTICATED STATE -->
+    <div id="listings-view" style="display:none">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <div class="section-title">My Listings</div>
+          <div class="section-count">3 active auctions</div>
+        </div>
+        <button class="add-listing-btn">
+          <span>＋</span> New listing
+        </button>
+      </div>
+
+      <div class="my-listings-grid">
+        <div class="listing-card">
+          <div class="listing-card-img">🎮</div>
+          <div class="listing-card-body">
+            <div class="listing-card-name">PlayStation 5 Disc Edition</div>
+            <div class="listing-card-row">
+              <span class="listing-card-label">Current bid</span>
+              <span class="listing-card-val">€420.00</span>
+            </div>
+            <div class="listing-card-row">
+              <span class="listing-card-label">Bids</span>
+              <span class="listing-card-val" style="color:var(--blue)">⚡ 11</span>
+            </div>
+            <div class="listing-card-row">
+              <span class="listing-card-label">Ends in</span>
+              <span class="listing-card-val" style="color:var(--red)">1h 22m</span>
+            </div>
+          </div>
+          <div class="listing-card-footer">
+            <span class="status live"><span class="status-dot"></span>Live</span>
+            <button class="manage-btn">Manage →</button>
+          </div>
+        </div>
+
+        <div class="listing-card">
+          <div class="listing-card-img">📚</div>
+          <div class="listing-card-body">
+            <div class="listing-card-name">Programming Books Bundle (×12)</div>
+            <div class="listing-card-row">
+              <span class="listing-card-label">Current bid</span>
+              <span class="listing-card-val">€85.00</span>
+            </div>
+            <div class="listing-card-row">
+              <span class="listing-card-label">Bids</span>
+              <span class="listing-card-val" style="color:var(--blue)">⚡ 3</span>
+            </div>
+            <div class="listing-card-row">
+              <span class="listing-card-label">Ends in</span>
+              <span class="listing-card-val" style="color:var(--muted)">2d 14h</span>
+            </div>
+          </div>
+          <div class="listing-card-footer">
+            <span class="status live"><span class="status-dot"></span>Live</span>
+            <button class="manage-btn">Manage →</button>
+          </div>
+        </div>
+
+        <div class="listing-card">
+          <div class="listing-card-img">🎧</div>
+          <div class="listing-card-body">
+            <div class="listing-card-name">Sony WH-1000XM5 Headphones</div>
+            <div class="listing-card-row">
+              <span class="listing-card-label">Current bid</span>
+              <span class="listing-card-val">€190.00</span>
+            </div>
+            <div class="listing-card-row">
+              <span class="listing-card-label">Bids</span>
+              <span class="listing-card-val" style="color:var(--blue)">⚡ 7</span>
+            </div>
+            <div class="listing-card-row">
+              <span class="listing-card-label">Ends in</span>
+              <span class="listing-card-val" style="color:var(--orange)">4h 50m</span>
+            </div>
+          </div>
+          <div class="listing-card-footer">
+            <span class="status hot"><span class="status-dot"></span>Active</span>
+            <button class="manage-btn">Manage →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  let isAuthed = false;
+
+  function switchTab(tab) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('section-' + tab).classList.add('active');
+  }
+
+  function toggleAuth() {
+    isAuthed = !isAuthed;
+    const toggle = document.getElementById('authToggle');
+    const navBtns = document.getElementById('nav-auth-btns');
+    const lockIcon = document.getElementById('lock-icon');
+    const gateView = document.getElementById('gate-view');
+    const listingsView = document.getElementById('listings-view');
+
+    toggle.classList.toggle('on', isAuthed);
+
+    if (isAuthed) {
+      navBtns.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:32px;height:32px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px">S</div>
+          <span style="font-size:13px;font-weight:600;color:var(--text)">Sasa</span>
+        </div>`;
+      lockIcon.style.display = 'none';
+      gateView.style.display = 'none';
+      listingsView.style.display = 'block';
+    } else {
+      navBtns.innerHTML = `
+        <button class="btn btn-ghost" style="margin-right:4px">Sign in</button>
+        <button class="btn btn-primary">Join now</button>`;
+      lockIcon.style.display = '';
+      gateView.style.display = 'block';
+      listingsView.style.display = 'none';
+    }
+  }
+
+  // Live countdown ticks
+  const countdowns = document.querySelectorAll('.countdown.ending-soon');
+  let secs = 42 * 60 + 18;
+  setInterval(() => {
+    if (secs > 0) secs--;
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    countdowns.forEach(el => {
+      el.innerHTML = `<span class="dot"></span>${m}m ${String(s).padStart(2,'0')}s`;
+    });
+  }, 1000);
+
+  // filter btn toggle
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

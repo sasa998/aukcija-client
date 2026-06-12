@@ -1,21 +1,12 @@
-"use client";
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
-import { useAuthStore } from "@/store/authStore";
-import { useLogout } from "@/features/auth/hooks/useAuth";
+export default async function HomePage() {
+  const token = (await cookies()).get("accessToken");
 
-export default function Home() {
-  const user = useAuthStore((state) => state.user);
-  const { mutate: logout } = useLogout();
+  if (token) {
+    redirect("/auctions");
+  }
 
-  return (
-    <div>
-      <div>
-        <button onClick={() => logout()}>Logout</button>
-      </div>
-
-      <div>
-        <h1>Dobrodošli, {user ? user.firstName : "Gost"}!</h1>
-      </div>
-    </div>
-  );
+  redirect("/login");
 }

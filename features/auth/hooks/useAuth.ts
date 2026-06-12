@@ -28,7 +28,7 @@ export function useLogin() {
     onSuccess: (data) => {
       setUser(data.user);
       queryClient.setQueryData(authKeys.me, data.user);
-      router.push("/");
+      router.replace("/auctions");
     },
     throwOnError: false,
   });
