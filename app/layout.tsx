@@ -36,13 +36,15 @@ export default function RootLayout({
         geist.variable,
       )}
     >
-      <body className="min-h-full flex flex-col justify-between font-[var(--font-inter)]">
+      <body className="min-h-screen flex flex-col font-[var(--font-inter)]">
         <Providers>
           <header>
             <Navbar />
             <HeroBanner />
           </header>
-          <main className="max-w-[1300px] mx-auto h-auto">{children}</main>
+          <main className="w-full max-w-[1300px] mx-auto flex-1">
+            {children}
+          </main>
           <footer className="py-6 text-center text-xs text-[#666] space-x-3">
             <span>© 2026 aukcija</span>
             <Link
