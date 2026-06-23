@@ -14,15 +14,24 @@ const statusStyles: Record<AuctionStatus, string> = {
 
 const columns: ColumnDef<Auction>[] = [
   {
+    key: "seller",
+    header: "Prodavac",
+    render: (row) => (
+      <span className="font-medium text-[#191919]">
+        {row.seller?.firstName || ""}
+      </span>
+    ),
+  },
+  {
     key: "title",
-    header: "Title",
+    header: "Ime",
     render: (row) => (
       <span className="font-medium text-[#191919]">{row.title}</span>
     ),
   },
   {
     key: "startingPrice",
-    header: "Starting Price",
+    header: "Početna cena",
     render: (row) => (
       <span>
         $
@@ -35,7 +44,7 @@ const columns: ColumnDef<Auction>[] = [
   },
   {
     key: "currentPrice",
-    header: "Highest Bid",
+    header: "Najviša ponuda",
     render: (row) => (
       <span className="font-medium">
         $
@@ -45,7 +54,7 @@ const columns: ColumnDef<Auction>[] = [
   },
   {
     key: "buyoutPrice",
-    header: "Buyout Price",
+    header: "Cena otkupa",
     render: (row) =>
       row.buyoutPrice ? (
         <span>
@@ -72,7 +81,7 @@ const columns: ColumnDef<Auction>[] = [
   },
   {
     key: "createdAt",
-    header: "Created",
+    header: "Kreirano",
     render: (row) => (
       <span className="text-[#666666]">
         {new Date(row.createdAt).toLocaleDateString("en-US", {
@@ -86,7 +95,7 @@ const columns: ColumnDef<Auction>[] = [
   },
   {
     key: "endsAt",
-    header: "Ends In",
+    header: "Završava u",
     render: (row) =>
       row.endsAt ? (
         <CountdownTimer endsAt={row.endsAt} />
@@ -117,7 +126,7 @@ const AuctionsTable = ({ page, data, isLoading, isError, setPage }: Props) => {
       {isLoading ? (
         <div className="rounded-lg border border-[#e0e0e0] bg-white">
           <div className="flex items-center justify-center py-16 text-[#666666]">
-            Loading your auctions…
+            Učitavanje aukcija...
           </div>
         </div>
       ) : (
@@ -125,7 +134,7 @@ const AuctionsTable = ({ page, data, isLoading, isError, setPage }: Props) => {
           columns={columns}
           data={data?.data ?? []}
           keyExtractor={(row) => row.id}
-          emptyMessage="You haven't created any auctions yet."
+          emptyMessage="Trenutno  ne postoje aukcije."
           pagination={
             data?.meta
               ? { meta: data.meta, currentPage: page, onPageChange: setPage }

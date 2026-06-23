@@ -1,7 +1,7 @@
 const STATS = [
-  { value: "248", label: "Live now" },
-  { value: "1,840", label: "Bids today" },
-  { value: "94%", label: "Completed" },
+  { value: "248", label: "Aktivne licitacije" },
+  { value: "1,840", label: "Ponude danas" },
+  { value: "94%", label: "Završene" },
 ] as const;
 
 export function HeroBanner() {
@@ -10,11 +10,11 @@ export function HeroBanner() {
       <div className="max-w-[1300px] mx-auto px-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 sm:gap-6">
         <div>
           <h1 className="text-xl sm:text-[22px] font-bold tracking-tight mb-1">
-            Live Auctions
+            Aukcija uživo
           </h1>
           <p className="text-[13px] opacity-80 font-light">
-            Bid on unique items from verified sellers. New auctions added every
-            day.
+            Licitirajte i prodajte svoje predmete. Pridružite se našoj zajednici
+            i otkrijte neverovatne ponude svaki dan!
           </p>
         </div>
 

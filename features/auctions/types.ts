@@ -1,5 +1,9 @@
 export type AuctionStatus = "ACTIVE" | "ENDED" | "CANCELLED" | "PENDING";
 
+type Seller = {
+  firstName: string;
+};
+
 export interface Auction {
   id: string;
   title: string;
@@ -10,6 +14,7 @@ export interface Auction {
   status: AuctionStatus;
   createdAt: string;
   endsAt?: string;
+  seller: Seller;
 }
 
 export interface CreateAuctionRequest {

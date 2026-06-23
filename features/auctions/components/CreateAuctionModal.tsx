@@ -27,6 +27,21 @@ const createAuctionSchema = z.object({
     .refine((v) => !v || (!isNaN(Number(v)) && Number(v) > 0), {
       message: "Buyout price must be a positive number",
     }),
+  images: z
+    .custom<FileList>()
+    .optional()
+    .refine(
+      (files) => !files || files.length <= 5,
+      "You can upload a maximum of 5 images",
+    )
+    .refine(
+      (files) =>
+        !files ||
+        Array.from(files).every((f) =>
+          ["image/jpeg", "image/png", "image/webp"].includes(f.type),
+        ),
+      "Only JPEG, PNG and WEBP images are allowed",
+    ),
 });
 
 type CreateAuctionFormValues = z.infer<typeof createAuctionSchema>;
@@ -57,19 +72,24 @@ export function CreateAuctionModal({
   };
 
   const onSubmit = (values: CreateAuctionFormValues) => {
-    createAuction(
-      {
-        title: values.title,
-        description: values.description,
-        startingPrice: Number(values.startingPrice),
-        buyoutPrice: values.buyoutPrice
-          ? Number(values.buyoutPrice)
-          : undefined,
-      },
-      {
-        onSuccess: () => handleClose(),
-      },
-    );
+    const formData = new FormData();
+
+    formData.append("title", values.title);
+    formData.append("description", values.description);
+    formData.append("startingPrice", values.startingPrice);
+    if (values.buyoutPrice) {
+      formData.append("buyoutPrice", values.buyoutPrice);
+    }
+
+    if (values.images && values.images.length > 0) {
+      Array.from(values.images).forEach((file) => {
+        formData.append("images", file);
+      });
+    }
+
+    createAuction(formData, {
+      onSuccess: () => handleClose(),
+    });
   };
 
   return (
@@ -96,7 +116,7 @@ export function CreateAuctionModal({
         >
           <div className="flex items-center justify-between">
             <DialogPrimitive.Title className="text-lg font-semibold text-[#191919]">
-              Create Auction
+              Napravi aukciju
             </DialogPrimitive.Title>
             <DialogPrimitive.Close
               render={
@@ -116,15 +136,15 @@ export function CreateAuctionModal({
               <FormAlert
                 message={
                   (error as { response?: { data?: { message?: string } } })
-                    ?.response?.data?.message ?? "Failed to create auction."
+                    ?.response?.data?.message ?? "Neuspelo kreiranje aukcije."
                 }
               />
             )}
 
             <FormInput
               id="title"
-              label="Title"
-              placeholder="Enter auction title"
+              label="Ime"
+              placeholder="Unesite ime aukcije"
               error={errors.title?.message}
               {...register("title")}
             />
@@ -134,12 +154,12 @@ export function CreateAuctionModal({
                 htmlFor="description"
                 className="block text-sm font-medium text-[#191919]"
               >
-                Description
+                Opis
               </label>
               <textarea
                 id="description"
                 rows={3}
-                placeholder="Describe the item being auctioned"
+                placeholder="Unesite opis aukcije"
                 className={`w-full px-3 py-2.5 border rounded-md text-sm text-[#191919] placeholder-[#999] outline-none transition-all resize-none focus:ring-2 focus:ring-[#0a66c2] focus:border-[#0a66c2] ${
                   errors.description
                     ? "border-[#b91c1c] focus:ring-[#b91c1c] focus:border-[#b91c1c]"
@@ -157,7 +177,7 @@ export function CreateAuctionModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormInput
                 id="startingPrice"
-                label="Starting Price"
+                label="Početna cena"
                 type="number"
                 min="0"
                 step="0.01"
@@ -168,7 +188,7 @@ export function CreateAuctionModal({
 
               <FormInput
                 id="buyoutPrice"
-                label="Buyout Price (optional)"
+                label="Cena otkupa (opciono)"
                 type="number"
                 min="0"
                 step="0.01"
@@ -178,6 +198,28 @@ export function CreateAuctionModal({
               />
             </div>
 
+            <div className="space-y-1">
+              <label
+                htmlFor="images"
+                className="block text-sm font-medium text-[#191919]"
+              >
+                Slike (max 5)
+              </label>
+              <input
+                id="images"
+                type="file"
+                multiple
+                accept="image/jpeg,image/png,image/webp"
+                className="w-full text-sm text-[#999] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#0a66c2] file:text-white hover:file:bg-[#0a66c2]/90 cursor-pointer"
+                {...register("images")}
+              />
+              {errors.images && (
+                <p className="text-xs text-[#b91c1c] mt-1">
+                  {errors.images.message}
+                </p>
+              )}
+            </div>
+
             <div className="flex justify-end gap-3 pt-2">
               <Button
                 type="button"
@@ -185,10 +227,10 @@ export function CreateAuctionModal({
                 onClick={handleClose}
                 disabled={isPending}
               >
-                Cancel
+                Otkaži
               </Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? "Creating…" : "Create Auction"}
+                {isPending ? "Kreiranje…" : "Napravi aukciju"}
               </Button>
             </div>
           </form>
