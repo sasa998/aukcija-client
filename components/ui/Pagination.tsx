@@ -10,7 +10,11 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export function Pagination({ meta, currentPage, onPageChange }: PaginationProps) {
+export function Pagination({
+  meta,
+  currentPage,
+  onPageChange,
+}: PaginationProps) {
   const { totalPages, total, limit, hasPrev, hasNext } = meta;
   const page = currentPage;
 
@@ -21,8 +25,8 @@ export function Pagination({ meta, currentPage, onPageChange }: PaginationProps)
     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 py-3 text-sm text-[#666666]">
       <span>
         {total === 0
-          ? "No results"
-          : `Showing ${from}–${to} of ${total} result${total !== 1 ? "s" : ""}`}
+          ? "Nema rezultata"
+          : `Prikazano ${from}–${to} od ${total} rezultata`}
       </span>
 
       <div className="flex items-center gap-1">
@@ -34,7 +38,7 @@ export function Pagination({ meta, currentPage, onPageChange }: PaginationProps)
           aria-label="Previous page"
         >
           <ChevronLeftIcon className="h-4 w-4" />
-          Prev
+          Nazad
         </Button>
 
         <span className="px-3 py-1 rounded border border-[#e0e0e0] bg-white font-medium text-[#191919] text-xs">
@@ -48,7 +52,7 @@ export function Pagination({ meta, currentPage, onPageChange }: PaginationProps)
           disabled={!hasNext}
           aria-label="Next page"
         >
-          Next
+          Napred
           <ChevronRightIcon className="h-4 w-4" />
         </Button>
       </div>

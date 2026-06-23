@@ -10,8 +10,12 @@ export const auctionApi = {
     return data;
   },
 
-  create: async (payload: CreateAuctionRequest): Promise<Auction> => {
-    const { data } = await api.post<Auction>("/auctions", payload);
+  create: async (payload: FormData): Promise<Auction> => {
+    const { data } = await api.post<Auction>("/auctions", payload, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return data;
   },
 

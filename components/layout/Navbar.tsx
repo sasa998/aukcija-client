@@ -80,7 +80,7 @@ export function Navbar() {
                 onClick={() => logout()}
                 className="px-4 py-[7px] rounded-full text-[13px] font-semibold cursor-pointer bg-transparent text-[#0a66c2] border border-[1.5px] border-[#0a66c2] hover:bg-[#e8f0fb] transition-colors duration-150"
               >
-                Log out
+                Odjava
               </button>
             </>
           ) : (
@@ -89,13 +89,13 @@ export function Navbar() {
                 href="/login"
                 className="px-4 py-[7px] rounded-full text-[13px] font-semibold bg-transparent text-[#0a66c2] border border-[1.5px] border-[#0a66c2] hover:bg-[#e8f0fb] transition-colors duration-150"
               >
-                Sign in
+                Prijavi se
               </Link>
               <Link
                 href="/register"
                 className="px-4 py-[7px] rounded-full text-[13px] font-semibold bg-[#0a66c2] text-white hover:bg-[#0958a8] transition-colors duration-150"
               >
-                Join now
+                Registrujte se
               </Link>
             </>
           )}
@@ -173,7 +173,7 @@ export function Navbar() {
                     }}
                     className="w-full px-4 py-2 rounded-full text-[13px] font-semibold cursor-pointer bg-transparent text-[#0a66c2] border border-[1.5px] border-[#0a66c2] hover:bg-[#e8f0fb] transition-colors duration-150"
                   >
-                    Log out
+                    Odjava
                   </button>
                 </>
               ) : (

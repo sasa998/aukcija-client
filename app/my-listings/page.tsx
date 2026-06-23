@@ -17,9 +17,9 @@ const MyListingsPage = () => {
     <div className="w-full px-4 sm:px-6 py-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#191919]">My Listings</h1>
+          <h1 className="text-2xl font-bold text-[#191919]">Moje aukcije</h1>
           <p className="text-sm text-[#666666] mt-1">
-            Manage and track your auction listings
+            Upravljajte i pratite svoje aukcije
           </p>
         </div>
         <Button
@@ -28,7 +28,7 @@ const MyListingsPage = () => {
           className="bg-[#0a66c2] hover:bg-[#004182] active:bg-[#004182]"
         >
           <PlusIcon />
-          Create Auction
+          Napravi aukciju
         </Button>
       </div>
 
