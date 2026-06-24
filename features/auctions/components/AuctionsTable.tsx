@@ -1,6 +1,7 @@
 "use client";
 
-import { DataTable, ColumnDef } from "@/components/ui/DataTable";
+import { useRouter } from "next/navigation";
+import { DataTable, ColumnDef } from "@/components/ui/table/DataTable";
 import { CountdownTimer } from "@/features/auctions/components/CountdownTimer";
 import { useMyAuctions } from "@/features/auctions/hooks/useAuctions";
 import { Auction, AuctionStatus } from "@/features/auctions/types";
@@ -115,6 +116,8 @@ interface Props {
 }
 
 const AuctionsTable = ({ page, data, isLoading, isError, setPage }: Props) => {
+  const router = useRouter();
+
   return (
     <>
       {isError && (
@@ -135,6 +138,7 @@ const AuctionsTable = ({ page, data, isLoading, isError, setPage }: Props) => {
           data={data?.data ?? []}
           keyExtractor={(row) => row.id}
           emptyMessage="Trenutno  ne postoje aukcije."
+          onRowClick={(row) => router.push(`/auctions/${row.id}`)}
           pagination={
             data?.meta
               ? { meta: data.meta, currentPage: page, onPageChange: setPage }
