@@ -50,6 +50,7 @@ export function useCreateAuction() {
     mutationFn: (payload: FormData) => auctionApi.create(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auctions", "my"] });
+      queryClient.invalidateQueries({ queryKey: ["auctions", "all"] });
       toast.success("Auction created successfully!");
     },
     onError: () => {

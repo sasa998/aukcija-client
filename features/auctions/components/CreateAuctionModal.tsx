@@ -2,7 +2,7 @@
 
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { XIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,6 +13,18 @@ import { FormInput } from "@/components/ui/FormInput";
 import { FormAlert } from "@/components/ui/FormAlert";
 import { useCreateAuction } from "@/features/auctions/hooks/useAuctions";
 import Image from "next/image";
+
+const imagesArraySchema = z
+  .array(z.instanceof(File))
+  .max(5, "Možete otpremiti maksimalno 5 slika")
+  .refine(
+    (files) =>
+      files.every((f) =>
+        ["image/jpeg", "image/png", "image/webp"].includes(f.type),
+      ),
+    "Dozvoljene su samo JPEG, PNG i WEBP slike",
+  )
+  .optional();
 
 const createAuctionSchema = z.object({
   title: z.string().min(3, "Ime mora imati najmanje 3 karaktera"),
@@ -29,21 +41,7 @@ const createAuctionSchema = z.object({
     .refine((v) => !v || (!isNaN(Number(v)) && Number(v) > 0), {
       message: "Cena otkupa mora biti pozitivan broj",
     }),
-  images: z
-    .custom<FileList>()
-    .optional()
-    .refine(
-      (files) => !files || files.length <= 5,
-      "Možete otpremiti maksimalno 5 slika",
-    )
-    .refine(
-      (files) =>
-        !files ||
-        Array.from(files).every((f) =>
-          ["image/jpeg", "image/png", "image/webp"].includes(f.type),
-        ),
-      "Dozvoljene su samo JPEG, PNG i WEBP slike",
-    ),
+  images: imagesArraySchema,
 });
 
 type CreateAuctionFormValues = z.infer<typeof createAuctionSchema>;
@@ -59,6 +57,7 @@ export function CreateAuctionModal({
 }: CreateAuctionModalProps) {
   const { mutate: createAuction, isPending, error } = useCreateAuction();
 
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -66,59 +65,53 @@ export function CreateAuctionModal({
     return () => {
       previewUrls.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [previewUrls]);
+  }, []);
 
   const {
     register,
     handleSubmit,
     reset,
     setValue,
+    getValues,
     watch,
     formState: { errors },
   } = useForm<CreateAuctionFormValues>({
     resolver: zodResolver(createAuctionSchema),
   });
 
-  const {
-    onChange: registerImagesOnChange,
-    ref: registerImagesRef,
-    ...imagesRegister
-  } = register("images");
+  const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files;
+    if (!selected || selected.length === 0) return;
 
-  const handleImagesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    await registerImagesOnChange(e);
-    const files = e.target.files;
-    previewUrls.forEach((url) => URL.revokeObjectURL(url));
-    if (!files || files.length === 0) {
-      setPreviewUrls([]);
-      return;
-    }
-    setPreviewUrls(Array.from(files).map((f) => URL.createObjectURL(f)));
+    const newFiles = Array.from(selected);
+    const updatedFiles = [...imageFiles, ...newFiles].slice(0, 5);
+    const newUrls = newFiles.map((f) => URL.createObjectURL(f));
+    const updatedUrls = [...previewUrls, ...newUrls].slice(0, 5);
+
+    setImageFiles(updatedFiles);
+    setPreviewUrls(updatedUrls);
+    setValue("images", updatedFiles, { shouldValidate: true });
+
+    e.target.value = "";
   };
 
   const handleRemoveImage = (index: number) => {
-    const currentFiles = watch("images");
-    if (!currentFiles) return;
-
-    const dt = new DataTransfer();
-    Array.from(currentFiles).forEach((file, i) => {
-      if (i !== index) dt.items.add(file);
-    });
-
     URL.revokeObjectURL(previewUrls[index]);
-    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
-    setValue("images", dt.files.length > 0 ? dt.files : undefined, {
+
+    const updatedFiles = imageFiles.filter((_, i) => i !== index);
+    const updatedUrls = previewUrls.filter((_, i) => i !== index);
+
+    setImageFiles(updatedFiles);
+    setPreviewUrls(updatedUrls);
+    setValue("images", updatedFiles.length > 0 ? updatedFiles : undefined, {
       shouldValidate: true,
     });
-
-    if (fileInputRef.current) {
-      fileInputRef.current.files = dt.files;
-    }
   };
 
   const handleClose = () => {
     previewUrls.forEach((url) => URL.revokeObjectURL(url));
     setPreviewUrls([]);
+    setImageFiles([]);
     reset();
     onOpenChange(false);
   };
@@ -134,9 +127,7 @@ export function CreateAuctionModal({
     }
 
     if (values.images && values.images.length > 0) {
-      Array.from(values.images).forEach((file) => {
-        formData.append("images", file);
-      });
+      values.images.forEach((file) => formData.append("images", file));
     }
 
     createAuction(formData, {
@@ -262,13 +253,9 @@ export function CreateAuctionModal({
                 type="file"
                 multiple
                 accept="image/jpeg,image/png,image/webp"
-                className="w-full text-sm text-[#999] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#0a66c2] file:text-white hover:file:bg-[#0a66c2]/90 cursor-pointer"
+                className="text-sm text-transparent file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#0a66c2] file:text-white hover:file:bg-[#0a66c2]/90 cursor-pointer file:cursor-pointer"
+                ref={fileInputRef}
                 onChange={handleImagesChange}
-                ref={(el) => {
-                  registerImagesRef(el);
-                  fileInputRef.current = el;
-                }}
-                {...imagesRegister}
               />
               {errors.images && (
                 <p className="text-xs text-[#b91c1c] mt-1">

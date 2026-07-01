@@ -32,7 +32,7 @@ export function Navbar() {
     <nav className="bg-white border-b border-[#e0e0e0] sticky top-0 z-50 shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
       <div className="max-w-[1300px] mx-auto px-4 sm:px-6 h-14 flex items-center gap-4 sm:gap-8">
         <Link
-          href="/"
+          href="/auctions"
           className="flex items-center gap-2 flex-shrink-0 no-underline"
         >
           <div className="w-8 h-8 bg-[#0a66c2] rounded-[6px] flex items-center justify-center text-white text-base">

@@ -15,17 +15,8 @@ const statusStyles: Record<AuctionStatus, string> = {
 
 const columns: ColumnDef<Auction>[] = [
   {
-    key: "seller",
-    header: "Prodavac",
-    render: (row) => (
-      <span className="font-medium text-[#191919]">
-        {row.seller?.firstName || ""}
-      </span>
-    ),
-  },
-  {
     key: "title",
-    header: "Ime",
+    header: "Predmet",
     render: (row) => (
       <span className="font-medium text-[#191919]">{row.title}</span>
     ),
