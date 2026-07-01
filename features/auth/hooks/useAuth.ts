@@ -45,8 +45,8 @@ export function useRegister() {
       setUser(data.user);
       queryClient.setQueryData(authKeys.me, data.user);
       toast.success("Nalog je kreiran, proverite svoj email!", {
-        description: "Redirecting you to login…",
-        position: "top-left",
+        description: "Nalog je kreiran, proverite svoj email!",
+        position: "top-right",
       });
       router.push("/login");
     },

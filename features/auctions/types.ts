@@ -1,4 +1,9 @@
-export type AuctionStatus = "ACTIVE" | "ENDED" | "CANCELLED" | "PENDING";
+export enum AuctionStatus {
+  ACTIVE = "ACTIVE",
+  ENDED = "ENDED",
+  CANCELLED = "CANCELLED",
+  NO_SALE = "NO_SALE",
+}
 
 type Seller = {
   firstName: string;
@@ -17,6 +22,7 @@ export interface Auction {
   seller: Seller;
   images?: string[];
   bids?: Bid[];
+  category?: string;
 }
 
 export interface Bid {
@@ -37,4 +43,5 @@ export interface CreateAuctionRequest {
   description: string;
   startingPrice: number;
   buyoutPrice?: number;
+  categoryId: string;
 }

@@ -13,7 +13,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-type Tab = "auctions" | "my-listings";
+type Tab = "auctions" | "my-auctions";
 
 export function Navbar() {
   const router = useRouter();
@@ -57,9 +57,9 @@ export function Navbar() {
           </button>
 
           <button
-            onClick={() => switchTab("my-listings")}
+            onClick={() => switchTab("my-auctions")}
             className={`flex items-center gap-1.5 px-4 text-[13px] font-medium border-b-2 transition-colors duration-150 cursor-pointer whitespace-nowrap select-none ${
-              pathname === "my-listings"
+              pathname === "my-auctions"
                 ? "text-[#0a66c2] border-[#0a66c2] font-semibold"
                 : "text-[#666666] border-transparent hover:text-[#191919]"
             }`}
@@ -145,9 +145,9 @@ export function Navbar() {
                 Auctions
               </button>
               <button
-                onClick={() => switchTab("my-listings")}
+                onClick={() => switchTab("my-auctions")}
                 className={`flex items-center gap-2 px-3 py-3 rounded-md text-[14px] font-medium transition-colors duration-150 text-left w-full ${
-                  pathname === "my-listings"
+                  pathname === "my-auctions"
                     ? "text-[#0a66c2] bg-[#e8f0fb] font-semibold"
                     : "text-[#666666] hover:text-[#191919] hover:bg-[#f3f2ef]"
                 }`}
