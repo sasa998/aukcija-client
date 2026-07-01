@@ -1,6 +1,7 @@
 "use client";
 
-import { DataTable, ColumnDef } from "@/components/ui/DataTable";
+import { useRouter } from "next/navigation";
+import { DataTable, ColumnDef } from "@/components/ui/table/DataTable";
 import { CountdownTimer } from "@/features/auctions/components/CountdownTimer";
 import { useMyAuctions } from "@/features/auctions/hooks/useAuctions";
 import { Auction, AuctionStatus } from "@/features/auctions/types";
@@ -14,17 +15,8 @@ const statusStyles: Record<AuctionStatus, string> = {
 
 const columns: ColumnDef<Auction>[] = [
   {
-    key: "seller",
-    header: "Prodavac",
-    render: (row) => (
-      <span className="font-medium text-[#191919]">
-        {row.seller?.firstName || ""}
-      </span>
-    ),
-  },
-  {
     key: "title",
-    header: "Ime",
+    header: "Predmet",
     render: (row) => (
       <span className="font-medium text-[#191919]">{row.title}</span>
     ),
@@ -115,6 +107,8 @@ interface Props {
 }
 
 const AuctionsTable = ({ page, data, isLoading, isError, setPage }: Props) => {
+  const router = useRouter();
+
   return (
     <>
       {isError && (
@@ -135,6 +129,7 @@ const AuctionsTable = ({ page, data, isLoading, isError, setPage }: Props) => {
           data={data?.data ?? []}
           keyExtractor={(row) => row.id}
           emptyMessage="Trenutno  ne postoje aukcije."
+          onRowClick={(row) => router.push(`/auctions/${row.id}`)}
           pagination={
             data?.meta
               ? { meta: data.meta, currentPage: page, onPageChange: setPage }

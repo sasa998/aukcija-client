@@ -7,14 +7,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Pagination } from "@/components/ui/Pagination";
+} from "@/components/ui/table/table";
+import { Pagination } from "@/components/ui/table/Pagination";
 import { PaginationMeta } from "@/lib/types";
 
 export interface ColumnDef<T> {
   key: string;
   header: string;
-  render?: (row: T) => React.ReactNode;
+  render?: (row: T, index: number) => React.ReactNode;
   className?: string;
 }
 
@@ -30,6 +30,7 @@ interface DataTableProps<T> {
   keyExtractor: (row: T) => string;
   emptyMessage?: string;
   pagination?: PaginationConfig;
+  onRowClick?: (row: T) => void;
 }
 
 export function DataTable<T>({
@@ -38,6 +39,7 @@ export function DataTable<T>({
   keyExtractor,
   emptyMessage = "No records found.",
   pagination,
+  onRowClick,
 }: DataTableProps<T>) {
   return (
     <div className="rounded-lg border border-[#e0e0e0] bg-white overflow-hidden">
@@ -65,10 +67,11 @@ export function DataTable<T>({
               </TableCell>
             </TableRow>
           ) : (
-            data.map((row) => (
+            data.map((row, rowIndex) => (
               <TableRow
                 key={keyExtractor(row)}
-                className="border-[#e0e0e0] hover:bg-[#f9f9f9]"
+                className={`border-[#e0e0e0] hover:bg-[#f9f9f9] ${onRowClick ? "cursor-pointer" : ""}`}
+                onClick={() => onRowClick?.(row)}
               >
                 {columns.map((col) => (
                   <TableCell
@@ -76,7 +79,7 @@ export function DataTable<T>({
                     className={`py-3 ${col.className ?? ""}`}
                   >
                     {col.render
-                      ? col.render(row)
+                      ? col.render(row, rowIndex)
                       : String(
                           (row as Record<string, unknown>)[col.key] ?? "—",
                         )}

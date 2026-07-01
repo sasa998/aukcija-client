@@ -2,6 +2,7 @@
 
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { XIcon } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,37 +12,36 @@ import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/ui/FormInput";
 import { FormAlert } from "@/components/ui/FormAlert";
 import { useCreateAuction } from "@/features/auctions/hooks/useAuctions";
+import Image from "next/image";
+
+const imagesArraySchema = z
+  .array(z.instanceof(File))
+  .max(5, "Možete otpremiti maksimalno 5 slika")
+  .refine(
+    (files) =>
+      files.every((f) =>
+        ["image/jpeg", "image/png", "image/webp"].includes(f.type),
+      ),
+    "Dozvoljene su samo JPEG, PNG i WEBP slike",
+  )
+  .optional();
 
 const createAuctionSchema = z.object({
-  title: z.string().min(3, "Title must be at least 3 characters"),
-  description: z.string().min(10, "Description must be at least 10 characters"),
+  title: z.string().min(3, "Ime mora imati najmanje 3 karaktera"),
+  description: z.string().min(10, "Opis mora imati najmanje 10 karaktera"),
   startingPrice: z
     .string()
-    .min(1, "Starting price is required")
+    .min(1, "Početna cena je obavezna")
     .refine((v) => !isNaN(Number(v)) && Number(v) > 0, {
-      message: "Starting price must be a positive number",
+      message: "Početna cena mora biti pozitivan broj",
     }),
   buyoutPrice: z
     .string()
     .optional()
     .refine((v) => !v || (!isNaN(Number(v)) && Number(v) > 0), {
-      message: "Buyout price must be a positive number",
+      message: "Cena otkupa mora biti pozitivan broj",
     }),
-  images: z
-    .custom<FileList>()
-    .optional()
-    .refine(
-      (files) => !files || files.length <= 5,
-      "You can upload a maximum of 5 images",
-    )
-    .refine(
-      (files) =>
-        !files ||
-        Array.from(files).every((f) =>
-          ["image/jpeg", "image/png", "image/webp"].includes(f.type),
-        ),
-      "Only JPEG, PNG and WEBP images are allowed",
-    ),
+  images: imagesArraySchema,
 });
 
 type CreateAuctionFormValues = z.infer<typeof createAuctionSchema>;
@@ -57,16 +57,61 @@ export function CreateAuctionModal({
 }: CreateAuctionModalProps) {
   const { mutate: createAuction, isPending, error } = useCreateAuction();
 
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, []);
+
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    getValues,
+    watch,
     formState: { errors },
   } = useForm<CreateAuctionFormValues>({
     resolver: zodResolver(createAuctionSchema),
   });
 
+  const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files;
+    if (!selected || selected.length === 0) return;
+
+    const newFiles = Array.from(selected);
+    const updatedFiles = [...imageFiles, ...newFiles].slice(0, 5);
+    const newUrls = newFiles.map((f) => URL.createObjectURL(f));
+    const updatedUrls = [...previewUrls, ...newUrls].slice(0, 5);
+
+    setImageFiles(updatedFiles);
+    setPreviewUrls(updatedUrls);
+    setValue("images", updatedFiles, { shouldValidate: true });
+
+    e.target.value = "";
+  };
+
+  const handleRemoveImage = (index: number) => {
+    URL.revokeObjectURL(previewUrls[index]);
+
+    const updatedFiles = imageFiles.filter((_, i) => i !== index);
+    const updatedUrls = previewUrls.filter((_, i) => i !== index);
+
+    setImageFiles(updatedFiles);
+    setPreviewUrls(updatedUrls);
+    setValue("images", updatedFiles.length > 0 ? updatedFiles : undefined, {
+      shouldValidate: true,
+    });
+  };
+
   const handleClose = () => {
+    previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    setPreviewUrls([]);
+    setImageFiles([]);
     reset();
     onOpenChange(false);
   };
@@ -82,9 +127,7 @@ export function CreateAuctionModal({
     }
 
     if (values.images && values.images.length > 0) {
-      Array.from(values.images).forEach((file) => {
-        formData.append("images", file);
-      });
+      values.images.forEach((file) => formData.append("images", file));
     }
 
     createAuction(formData, {
@@ -210,13 +253,37 @@ export function CreateAuctionModal({
                 type="file"
                 multiple
                 accept="image/jpeg,image/png,image/webp"
-                className="w-full text-sm text-[#999] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#0a66c2] file:text-white hover:file:bg-[#0a66c2]/90 cursor-pointer"
-                {...register("images")}
+                className="text-sm text-transparent file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#0a66c2] file:text-white hover:file:bg-[#0a66c2]/90 cursor-pointer file:cursor-pointer"
+                ref={fileInputRef}
+                onChange={handleImagesChange}
               />
               {errors.images && (
                 <p className="text-xs text-[#b91c1c] mt-1">
                   {errors.images.message}
                 </p>
+              )}
+              {previewUrls.length > 0 && (
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 pt-2">
+                  {previewUrls.map((url, index) => (
+                    <div key={url} className="relative group aspect-square">
+                      <Image
+                        src={url}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-full object-cover rounded-md border border-[#c2c2c2]"
+                        width={100}
+                        height={100}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(index)}
+                        className="absolute -top-1.5 -right-1.5 bg-[#b91c1c] text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                        aria-label={`Remove image ${index + 1}`}
+                      >
+                        <XIcon className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
 

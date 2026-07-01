@@ -1,5 +1,5 @@
 import { api } from "@/lib/axios";
-import { Auction, CreateAuctionRequest } from "../types";
+import { Auction, Bid, CreateAuctionRequest, PlaceBidRequest } from "../types";
 import { PaginatedResponse } from "@/lib/types";
 
 export const auctionApi = {
@@ -7,6 +7,11 @@ export const auctionApi = {
     const { data } = await api.get<PaginatedResponse<Auction>>("/auctions", {
       params: { page, limit },
     });
+    return data;
+  },
+
+  getById: async (id: string): Promise<Auction> => {
+    const { data } = await api.get<Auction>(`/auctions/${id}`);
     return data;
   },
 
@@ -26,6 +31,17 @@ export const auctionApi = {
     const { data } = await api.get<PaginatedResponse<Auction>>("/auctions/my", {
       params: { page, limit },
     });
+    return data;
+  },
+
+  placeBid: async (
+    auctionId: string,
+    payload: PlaceBidRequest,
+  ): Promise<Bid> => {
+    const { data } = await api.post<Bid>(
+      `/auctions/${auctionId}/bids`,
+      payload,
+    );
     return data;
   },
 };
