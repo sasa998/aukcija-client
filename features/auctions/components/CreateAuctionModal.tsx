@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/ui/FormInput";
 import { FormAlert } from "@/components/ui/FormAlert";
 import { useCreateAuction } from "@/features/auctions/hooks/useAuctions";
+import { CATEGORIES } from "@/lib/categories";
 import Image from "next/image";
 
 const imagesArraySchema = z
@@ -29,6 +30,7 @@ const imagesArraySchema = z
 const createAuctionSchema = z.object({
   title: z.string().min(3, "Ime mora imati najmanje 3 karaktera"),
   description: z.string().min(10, "Opis mora imati najmanje 10 karaktera"),
+  categoryId: z.string().min(1, "Kategorija je obavezna"),
   startingPrice: z
     .string()
     .min(1, "Početna cena je obavezna")
@@ -72,11 +74,12 @@ export function CreateAuctionModal({
     handleSubmit,
     reset,
     setValue,
-    getValues,
-    watch,
     formState: { errors },
   } = useForm<CreateAuctionFormValues>({
     resolver: zodResolver(createAuctionSchema),
+    defaultValues: {
+      categoryId: "",
+    },
   });
 
   const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,6 +124,7 @@ export function CreateAuctionModal({
 
     formData.append("title", values.title);
     formData.append("description", values.description);
+    formData.append("category", values.categoryId);
     formData.append("startingPrice", values.startingPrice);
     if (values.buyoutPrice) {
       formData.append("buyoutPrice", values.buyoutPrice);
@@ -213,6 +217,54 @@ export function CreateAuctionModal({
               {errors.description && (
                 <p className="text-xs text-[#b91c1c] mt-1">
                   {errors.description.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <label
+                htmlFor="categoryId"
+                className="block text-sm font-medium text-[#191919]"
+              >
+                Kategorija
+              </label>
+              <div className="relative">
+                <select
+                  id="categoryId"
+                  className={`w-full appearance-none px-3 py-2.5 pr-9 border rounded-md text-sm text-[#191919] outline-none transition-all bg-white focus:ring-2 focus:ring-[#0a66c2] focus:border-[#0a66c2] ${
+                    errors.categoryId
+                      ? "border-[#b91c1c] focus:ring-[#b91c1c] focus:border-[#b91c1c]"
+                      : "border-[#c2c2c2] hover:border-[#888]"
+                  }`}
+                  {...register("categoryId")}
+                >
+                  <option value="" disabled>
+                    Izaberite kategoriju
+                  </option>
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.icon} {cat.name}
+                    </option>
+                  ))}
+                </select>
+                <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#888]">
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </span>
+              </div>
+              {errors.categoryId && (
+                <p className="text-xs text-[#b91c1c] mt-1">
+                  {errors.categoryId.message}
                 </p>
               )}
             </div>

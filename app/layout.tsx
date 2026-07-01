@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { HeroBanner } from "@/components/layout/HeroBanner";
 import { Navbar } from "@/components/layout/Navbar";
 import Link from "next/link";
+import { Toaster } from "sonner";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -61,6 +62,7 @@ export default function RootLayout({
             </Link>
           </footer>
         </Providers>
+        <Toaster position="top-right" richColors duration={5000} />
       </body>
     </html>
   );

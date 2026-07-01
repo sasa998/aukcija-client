@@ -51,10 +51,13 @@ export function useCreateAuction() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auctions", "my"] });
       queryClient.invalidateQueries({ queryKey: ["auctions", "all"] });
-      toast.success("Auction created successfully!");
+      toast.success("Aukcija kreirana uspešno!", {
+        description:
+          "Aukcija je kreirana i sada je dostupna za pregled i licitaciju.",
+      });
     },
     onError: () => {
-      toast.error("Failed to create auction. Please try again.");
+      toast.error("Neuspešno kreiranje aukcije. Pokušajte ponovo.");
     },
     throwOnError: false,
   });
@@ -73,10 +76,10 @@ export function usePlaceBid(auctionId: string) {
       queryClient.invalidateQueries({
         queryKey: ["auctions", auctionId, "bids"],
       });
-      toast.success("Bid placed successfully!");
+      toast.success("Ponuda uspešno postavljena!");
     },
     onError: () => {
-      toast.error("Failed to place bid. Please try again.");
+      toast.error("Neuspešno postavljanje ponude. Pokušajte ponovo.");
     },
     throwOnError: false,
   });
