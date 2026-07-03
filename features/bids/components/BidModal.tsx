@@ -6,12 +6,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/ui/FormInput";
 import { FormAlert } from "@/components/ui/FormAlert";
-import { usePlaceBid } from "@/features/auctions/hooks/useAuctions";
 import { Auction } from "@/features/auctions/types";
+import { usePlaceBid } from "@/features/bids/hooks/usePlaceBid";
 
 const bidSchema = z.object({
   amount: z
@@ -49,7 +48,7 @@ export function BidModal({ open, onOpenChange, auction }: BidModalProps) {
   };
 
   const onSubmit = (values: BidFormValues) => {
-    placeBid({ amount: Number(values.amount) }, { onSuccess: handleClose });
+    placeBid(Number(values.amount), { onSuccess: handleClose });
   };
 
   const minBid = auction.currentPrice + 0.01;
@@ -88,7 +87,7 @@ export function BidModal({ open, onOpenChange, auction }: BidModalProps) {
               <div className="rounded-lg border border-[#e0e0e0] px-3 py-2">
                 <p className="text-[#666666] text-xs mb-0.5">Trenutna cena</p>
                 <p className="font-semibold text-[#191919]">
-                  $
+                  BAM{" "}
                   {auction.currentPrice.toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                   })}
@@ -97,7 +96,7 @@ export function BidModal({ open, onOpenChange, auction }: BidModalProps) {
               <div className="rounded-lg border border-[#e0e0e0] px-3 py-2">
                 <p className="text-[#666666] text-xs mb-0.5">Min. ponuda</p>
                 <p className="font-semibold text-[#0a66c2]">
-                  $
+                  BAM{" "}
                   {minBid.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </p>
               </div>
@@ -105,13 +104,13 @@ export function BidModal({ open, onOpenChange, auction }: BidModalProps) {
 
             <FormInput
               id="bid-amount"
-              label="Vaša ponuda ($)"
+              label="Vaša ponuda (BAM)"
               type="number"
               step="0.01"
               min={minBid}
               {...register("amount")}
               error={errors.amount?.message}
-              // placeholder={`Minimum $${minBid.toFixed(2)}`}
+              placeholder={`Minimum $${minBid.toFixed(2)}`}
             />
 
             {error && (
