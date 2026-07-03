@@ -5,10 +5,11 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeftIcon, UserIcon, CalendarIcon } from "lucide-react";
 
 import { useGetAuction } from "@/features/auctions/hooks/useAuctions";
+import { useAuctionSocket } from "@/features/auctions/hooks/useAuctionSocket";
 import { AuctionImageGallery } from "@/features/auctions/components/AuctionImageGallery";
 import { AuctionPriceCard } from "@/features/auctions/components/AuctionPriceCard";
 import { AuctionBidHistory } from "@/features/auctions/components/AuctionBidHistory";
-import { BidModal } from "@/features/auctions/components/BidModal";
+import { BidModal } from "@/features/bids/components/BidModal";
 
 function AuctionDetailSkeleton() {
   return (
@@ -42,6 +43,7 @@ export default function AuctionDetailPage() {
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
 
   const { data: auction, isLoading, isError } = useGetAuction(id);
+  useAuctionSocket([id]);
 
   if (isLoading) return <AuctionDetailSkeleton />;
 

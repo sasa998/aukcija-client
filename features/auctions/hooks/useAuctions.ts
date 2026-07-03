@@ -1,10 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { auctionApi } from "@/features/auctions/api/auction.api";
-import {
-  CreateAuctionRequest,
-  PlaceBidRequest,
-} from "@/features/auctions/types";
 
 export const auctionKeys = {
   myAuctions: (page: number, limit: number) =>
@@ -16,7 +12,7 @@ export const auctionKeys = {
   auction: (id: string) => ["auctions", id] as const,
 };
 
-export function useGetAllAuctions(page = 1, limit = 10) {
+export function useGetAllAuctions(page = 1, limit = 5) {
   return useQuery({
     queryKey: auctionKeys.allAuctions(page, limit),
     queryFn: () => auctionApi.getAll(page, limit),
@@ -25,7 +21,7 @@ export function useGetAllAuctions(page = 1, limit = 10) {
   });
 }
 
-export function useMyAuctions(page = 1, limit = 10) {
+export function useMyAuctions(page = 1, limit = 5) {
   return useQuery({
     queryKey: auctionKeys.myAuctions(page, limit),
     queryFn: () => auctionApi.getMyAuctions(page, limit),
@@ -58,28 +54,6 @@ export function useCreateAuction() {
     },
     onError: () => {
       toast.error("Neuspešno kreiranje aukcije. Pokušajte ponovo.");
-    },
-    throwOnError: false,
-  });
-}
-
-export function usePlaceBid(auctionId: string) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (payload: PlaceBidRequest) =>
-      auctionApi.placeBid(auctionId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: auctionKeys.auction(auctionId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["auctions", auctionId, "bids"],
-      });
-      toast.success("Ponuda uspešno postavljena!");
-    },
-    onError: () => {
-      toast.error("Neuspešno postavljanje ponude. Pokušajte ponovo.");
     },
     throwOnError: false,
   });

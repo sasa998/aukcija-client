@@ -23,6 +23,8 @@ export interface Auction {
   images?: string[];
   bids?: Bid[];
   category?: string;
+  sellerId: string;
+  bidCount?: number;
 }
 
 export interface Bid {
